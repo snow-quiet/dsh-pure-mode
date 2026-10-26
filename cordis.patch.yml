@@ -1,0 +1,55 @@
+# dsh-pure-mode bundle patch
+#
+# 两条行，两个角色，名字必须不同：
+#
+#  1) host 条目 —— name 是**裸包名** `dsh-pure-mode`，这是 client-modules 认的
+#     「包根说明符」（exactPackageSpecifier 要求不含 "/"）。它让本包的
+#     dsh.client + exports["./client"] 编入 __DSH_BOOT__（bundle URL:
+#     /plugins/dsh-pure-mode/client.js）。config.mode = host 时 apply 只装路由。
+#
+#  2) preset 的子插件 —— name 必须带**子路径** `dsh-pure-mode/agent`。
+#     含 "/" 的说明符在 client-modules 里解析为 undefined，因此不会产生第二个
+#     source。否则同一个包会同时被 host 树和 preset 树引用，触发
+#     "package resolves from multiple active Loader sources" 而被整条踢出 client 表。
+#
+# 工具插件（fs / fs-search / pwsh / web）：挂上但**默认全部隐藏**。
+# 装配时按 <DSH_HOME>/pure-mode/tools.json 里的选择过滤 tools 数组，
+# 没选中的工具 schema 不会进入请求，模型看不到也就调不了。
+- insert:
+    - id: pure-mode
+      name: dsh-pure-mode
+      config:
+        mode: host
+
+    - id: preset-pure
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: pure
+        name: 纯净模式
+        description: 只装配你自己的提示词：没有身份、没有工具、没有运行时上下文、没有技能目录。
+        order: 0
+        plugins:
+          - id: pure-prompt
+            name: 'dsh-pure-mode/agent'
+            config:
+              mode: agent
+              # 提示词文件；留空则用 %USERPROFILE%\.dsh\pure-prompt.md
+              promptFile: ''
+              # true = 这一段是唯一系统提示词（默认）
+              # 提示词文件每轮重读，改完下一轮就生效，不需要重启
+              exclusive: true
+
+          # ── 可选工具（schema 默认被过滤掉，只按工具选择放行）─────────
+          # 最小操作集：文件读写 + 内容/文件名搜索 + 命令执行。
+          # preset 的硬规则：任何一个子插件 failed/pending，整个 preset 就标成
+          # broken、从模式列表里消失 —— 所以这里只放这三个已验证能挂载的插件，
+          # 其余工具（web / jobs / schedule / goal / todo / skill / subagent…）一律不挂。
+          - id: pure-tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: pure-tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              # 必填：与官方 standard preset 保持一致，缺了会 invalid config
+              sampleOverCapGlobResults: false
+          - id: pure-tool-pwsh
+            name: '@deepseek-ai/dsh-tool-pwsh'
