@@ -15,9 +15,9 @@ DSH 的**纯净模式**：一个 agent preset，只装配你自己的提示词�
 |---|---|---|
 | ① section | `systemPrompt.section({ complete: true })` | 官方 assemble 保证这是唯一段 |
 | ② waterfall | `system-prompt/assemble` + `prepend` | 压掉第三方注册的段/上下文/工具 |
-| ③ 方法级 | 包 `agent.loopCtx.systemPrompt.assemble` | 跑在 dsh-purge 的 assemble guard **外面**，并占住它的 `Symbol.for("dsh-purge.assembleGuard")` 槽让它不再重包 |
+| ③ 方法级 | 包 `agent.loopCtx.systemPrompt.assemble` | 在最外层接管，并占住全局 Symbol 守卫槽，防止其他插件每轮重包 |
 
-第 ③ 层是必须的：dsh-purge 在内层 `rewriteLiveAssembly` 里每轮把 inject 塞回去，只靠 ①② 会被它覆盖。
+第 ③ 层是必须的：内层守卫每轮会把 inject 塞回去，只靠 ①② 会被覆盖。
 
 ## 提示词
 
