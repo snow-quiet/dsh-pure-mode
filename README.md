@@ -67,6 +67,14 @@ dsh-pure-mode/
 
 回滚：删掉这两处，`pnpm install`，重启。插件不写 profile 之外的配置。
 
+### 从 GitHub 安装
+
+```powershell
+git clone https://github.com/snow-quiet/dsh-pure-mode "$env:USERPROFILE\.dsh\plugins\dsh-pure-mode"
+```
+
+然后按下面「从 zip 安装」的第 2–4 步配置 profile 并 `pnpm install`。
+
 ### 从 zip 安装
 
 1. 解压，得到 `dsh-pure-mode/` 目录，放到任意位置，例如

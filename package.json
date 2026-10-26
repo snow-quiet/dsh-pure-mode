@@ -2,6 +2,14 @@
   "name": "dsh-pure-mode",
   "version": "0.4.0",
   "description": "DSH 纯净模式：只装配你自己的提示词；左上角「纯净模式」面板管理全局 / 会话提示词。",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snow-quiet/dsh-pure-mode.git"
+  },
+  "homepage": "https://github.com/snow-quiet/dsh-pure-mode#readme",
+  "bugs": {
+    "url": "https://github.com/snow-quiet/dsh-pure-mode/issues"
+  },
   "type": "module",
   "main": "index.js",
   "exports": {
